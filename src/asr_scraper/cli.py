@@ -18,7 +18,7 @@ def discover(
 
     console.print("Discovery complete")
     
-@app_command()
+@app.command()
 def build():
     console.print("Building dataset")
     # TODO - add building dataset in orchestrator
@@ -26,5 +26,5 @@ def build():
     console.print("Dataset successfully built")
     
     
-if __main__ == "__main__":
+if __name__ == "__main__":
     app()   

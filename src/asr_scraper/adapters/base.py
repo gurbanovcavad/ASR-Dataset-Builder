@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Iterable
+from typing import Iterable, List
+from ..models import VideoItem
 
 class ChannelAdapter(ABC):
     name: str

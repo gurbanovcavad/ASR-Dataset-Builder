@@ -1,3 +1,9 @@
+import json
+import subprocess
+from datetime import datetime
+from ..models import VideoItem
+from .base import ChannelAdapter, registry
+
 class YouTubeAdapter(ChannelAdapter):
     name = "youtube"
 
