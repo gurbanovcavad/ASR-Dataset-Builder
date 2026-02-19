@@ -23,11 +23,38 @@ class YouTubeAdapter(ChannelAdapter):
         
         return False
 
+    def normalize_channel_ref(channel_ref: str):
+        cmd = [
+            'yt-dlp', '--quiet', '--max-downloads', '1', '--skip-download',
+            '--no-warnings', '--print', '%(channel_id)s', channel_ref
+        ]
+        try:
+            res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            channel_id = res.stdout.strip()
+            
+            if channel_id:
+                return channel_id
+            else:
+                raise Exception("Empty channel_id")
+
+        except subprocess.CalledProcessError as e:
+            if e.returncode == 101:
+                channel_id = e.output.strip() if e.output else None
+                if channel_id:
+                    return channel_id
+                else:
+                    print("Empty channel_id")
+                    return None
+            else:
+                print(f"Failed to fetch channel_id: {e}")
+                return None
+        
+    
     def list_videos(self, channel_ref: str):
         cmd = [
             "yt-dlp",
             "--flat-playlist",
-            "--dump-single-json",
+            "--dump-json",
             "--ignore-errors",
             "--no-warnings",
             channel_ref
