@@ -23,7 +23,7 @@ class YouTubeAdapter(ChannelAdapter):
         
         return False
 
-    def normalize_channel_ref(channel_ref: str):
+    def normalize_channel_ref(self, channel_ref: str):
         cmd = [
             'yt-dlp', '--quiet', '--max-downloads', '1', '--skip-download',
             '--no-warnings', '--print', '%(channel_id)s', channel_ref
@@ -48,9 +48,10 @@ class YouTubeAdapter(ChannelAdapter):
             else:
                 print(f"Failed to fetch channel_id: {e}")
                 return None
-        
     
     def list_videos(self, channel_ref: str):
+        if not self.can_handle(channel_ref):
+            return None
         cmd = [
             "yt-dlp",
             "--flat-playlist",
@@ -61,15 +62,20 @@ class YouTubeAdapter(ChannelAdapter):
         ]
         
         try:
-            result = subprocess.run(
+            res = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
                 check=True
             )
-            
+            process = subprocess.Popen(
+                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+            )
+            # get normalized channel reference
+            channel = self.normalize_channel_ref(channel_ref)
+
             # remove all the spaces before and after the string
-            for line in result.stdout.strip().split('\n'):
+            for line in iter(process.stdout.readline, ""):
                 if not line:
                     continue
                     
@@ -87,7 +93,7 @@ class YouTubeAdapter(ChannelAdapter):
                     
                     yield VideoItem(
                         platform="youtube",
-                        channel_ref=self.normalize_channel_ref(channel_ref),
+                        channel_ref=channel,
                         video_id=data.get('id', ''),
                         title=data.get('title', 'Untitled'),
                         url=f"https://youtube.com/watch?v={data.get('id', '')}",
@@ -99,7 +105,7 @@ class YouTubeAdapter(ChannelAdapter):
                     continue
                     
         except subprocess.CalledProcessError as e:
-            print(f"Error listing videos: {e.stderr}")
+            print(f"Failed to list videos: {e.stderr}")
             return
         
-registry.register(YouTubeAdapter())
+registry.register("youtube", YouTubeAdapter())
