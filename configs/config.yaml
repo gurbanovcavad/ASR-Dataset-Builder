@@ -1,0 +1,13 @@
+output_dir: ./data
+channels_file: ./channels.txt
+sample_rate: 16000
+mono: true
+pcm_bit_depth: 16
+concurrency: 2
+# max_videos_per_channel: 
+# since_date: 
+skip_existing: true
+write_manifest: ./manifest.jsonl
+# platform_overrides: 
+#   youtube: 
+#   x: 

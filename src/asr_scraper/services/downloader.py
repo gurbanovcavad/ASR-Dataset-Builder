@@ -18,6 +18,7 @@ class Downloader:
         retry=retry_if_exception_type(DownloadError)
     )
     def download_video(self, url: str, video_id: str) -> Optional[Path]:
+        # check if the video is downloaded before, if it is, then skip it based on the config
         output_template = self.temp_dir / f"{video_id}_%(ext)s"
         cmd = [
             "yt-dlp",
@@ -32,7 +33,7 @@ class Downloader:
         ]
         
         try:
-            result = subprocess.run(
+            res = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,

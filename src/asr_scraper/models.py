@@ -2,7 +2,7 @@ from typing import Optional
 from dataclasses import dataclass
 from datetime import datetime, date
 
-@dataclass(Frozen=True)
+@dataclass(frozen=True)
 class VideoItem:
     platform: str
     channel_ref: str
@@ -12,10 +12,10 @@ class VideoItem:
     upload_date: Optional[date] = None
     duration_s: Optional[int] = None
     
-@dataclass(Frozen=True)
+@dataclass(frozen=True)
 class JobResult:
-    ts_utc: datetime
     platform: str
+    ts_utc: datetime
     channel_ref: str
     video_id: str
     url: str
