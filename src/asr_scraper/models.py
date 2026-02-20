@@ -14,8 +14,8 @@ class VideoItem:
     
 @dataclass(frozen=True)
 class JobResult:
+    ts_utc: str
     platform: str
-    ts_utc: datetime
     channel_ref: str
     video_id: str
     url: str
