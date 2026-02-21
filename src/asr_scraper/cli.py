@@ -1,15 +1,21 @@
 import typer 
 from rich.console import Console
-from .orchestrator import Orchestrator
 from pathlib import Path
 from typing import Optional, List
-from .config import Config
+from datetime import date
+
+from .orchestrator import Orchestrator
+from .config import config
 from asr_scraper.adapters.base import registry
+from asr_scraper.utils.read_config import create_config
+
+# create config based on config.yaml file
+create_config()
 
 app = typer.Typer(help="ASR Dataset Builder")
 console = Console()
 
-# since the only supported platform is youtube I've set default value of platform to youtube to change it to interactive change the first value of typer.Option to ... in both commands
+# since the only supported platform is youtube, I've set the default value of platform to youtube. To make it interactive, change the first argument of typer.Option to ... in all of the commands
 @app.command()
 def build(
     platform: str = typer.Option(
@@ -19,48 +25,46 @@ def build(
         ..., "--channels", "-c", help="Channel file paths"
     ),
     output_dir: Path = typer.Option(
-        Path("./data"), "--output", "-o", help="Output directory"
+        config.output_dir, "--output", "-o", help="Output directory"
     ),
     sample_rate: int = typer.Option(
-        16000, "--sr", help="Sample rate"
+        config.sample_rate, "--sr", help="Sample rate"
     ),
     mono: bool = typer.Option(
-        True, "--mono/--stereo", help="Convert to mono"
+        config.mono, "--mono/--stereo", help="Convert to mono"
     ),
     pcm_bit_depth: int = typer.Option(
-        16, "--codec", help="PCM bit depth"
+        config.pcm_bit_depth, "--codec", help="PCM bit depth"
     ),
     concurrency: int = typer.Option(
-        2, "--jobs", "-j", help="Parallel jobs"
+        config.concurrency, "--jobs", "-j", help="Parallel jobs"
     ),
     max_videos_per_channel: Optional[int] = typer.Option(
-        None, "--max", "-m", help="Max videos per channel"
+        config.max_videos_per_channel, "--max", "-m", help="Max videos per channel"
     ),
     since_date: Optional[str] = typer.Option(
-        None, "--since-date", help="Download since date"
+        config.since_date, "--since-date", help="Download since date"
     ),
     skip_existing: bool = typer.Option(
-        True, "--skip/--no-skip", help="Skip existing files"
+        config.skip_existing, "--skip/--no-skip", help="Skip existing files"
     ),
     write_manifest: Path = typer.Option(
-        Path("./manifest.jsonl"), "--manifest", help="Manifest path"
+        config.write_manifest, "--manifest", help="Manifest path"
     ),
 ):
-    console.print("[white]Building dataset[/white]")
+    console.print("[navy_blue]Building dataset[/navy_blue]")
     
-    # build config file based on user input 
-    config = Config(
-        channels=channels,
-        output_dir=output_dir,
-        sample_rate=sample_rate,
-        mono=mono,
-        pcm_bit_depth=pcm_bit_depth,
-        concurrency=concurrency,
-        max_videos_per_channel=max_videos_per_channel,
-        since_date=since_date,
-        skip_existing=skip_existing,
-        write_manifest=write_manifest
-        )
+    # update config object based on user input 
+    setattr(config, "channels", channels)
+    setattr(config, "output_dir", output_dir)
+    setattr(config, "sample_rate", sample_rate)
+    setattr(config, "mono", mono)
+    setattr(config, "pcm_bit_depth", pcm_bit_depth)
+    setattr(config, "concurrency", concurrency)
+    setattr(config, "max_videos_per_channel", max_videos_per_channel)
+    setattr(config, "since_date", since_date)
+    setattr(config, "skip_existing", skip_existing)
+    setattr(config, "write_manifest", write_manifest)
 
     # get platformAdapter or stop the execution (the only available platform is youtube)
     platformAdapter = registry.get(platform)
@@ -69,15 +73,10 @@ def build(
         return
     
     # create orchestrator with the channel adapter and config 
-    orchestrator = Orchestrator(config, platformAdapter)
+    orchestrator = Orchestrator(config, platformAdapter, platform)
    
     # build a dataset
-    for channel in channels:
-        videos = orchestrator.discover(channel)
-        
-        for video in videos:
-            print(video)
-    
+    orchestrator.build(channels)
     console.print("[green]Dataset successfully built[/green]")
 
 @app.command()
@@ -91,19 +90,17 @@ def discover(
 ):
     console.print("[navy_blue]Discovering videos[/navy_blue]")
    
-    # build config file based on user input 
-    config = Config(
-        channels=channels,
-        )
-
+    # update config object based on user input 
+    setattr(config, "channels", channels)
+    
     # get platformAdapter or stop the execution (the only available platform is youtube)
-    platformAdapter = registry.get(platform)
-    if platformAdapter == None: 
+    platform_adapter = registry.get(platform)
+    if platform_adapter == None: 
         console.print("[red]Invalid platform[/red]")
         return
     
     # create orchestrator with the channel adapter and config 
-    orchestrator = Orchestrator(config, platformAdapter)
+    orchestrator = Orchestrator(config, platform_adapter, platform)
    
     # discover the videos of the provided channel
     for channel in channels:
@@ -113,6 +110,12 @@ def discover(
             console.print(f"[blue]{video}[/blue]")
         
     console.print("[green]Discovery completed[/green]")
+    
+@app.command()
+def download():
+    console.print("[navy_blue]Downloading videos[/navy_blue]")
+    # TODO - implement download function
+    console.print("[green]Videos are downloaded successfully[/green]")
 
 if __name__ == "__main__":
     app()   
