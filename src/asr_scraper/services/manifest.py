@@ -8,13 +8,25 @@ from ..models import JobResult
 class ManifestWriter:
     def __init__(self, manifest_path: Path):
         self.manifest_path = manifest_path
+        self.videos: set[tuple[str, str]] = set()
         self._ensure_file()
+        self._load()
     
     def _ensure_file(self):
         self.manifest_path.parent.mkdir(parents=True, exist_ok=True)
         
         if not self.manifest_path.exists():
             self.manifest_path.touch()
+
+    def _load(self):
+        with self.manifest_path.open() as f:
+            for line in f:
+                data = json.loads(line)
+                if data["status"] == "ok":
+                    self.videos.add((data["platform"], data["video_id"]))
+
+    def is_downloaded(self, platform: str, video_id: str) -> bool:
+        return (platform, video_id) in self.videos
 
     def append(self, result: JobResult):
         data = {
@@ -36,21 +48,3 @@ class ManifestWriter:
         with open(self.manifest_path, 'a', encoding='utf-8') as f:
             f.write(json.dumps(data) + '\n')
             
-    def print_all(self) -> List[JobResult]:
-        res = []
-        
-        if not self.manifest_path.exists():
-            return []
-        
-        with open(self.manifest_path, 'r', encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-
-                if not line:
-                    continue
-
-                data = json.loads(line)
-                data['ts_utc'] = datetime.fromisoformat(data['ts_utc'])
-                res.append(JobResult(**data))
-
-        return res
