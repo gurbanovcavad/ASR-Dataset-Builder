@@ -1,4 +1,5 @@
 output_dir: ./data
+# for running via the main function
 channels_file: /home/cavad/Projects/asr-scraper/channels.txt
 sample_rate: 16000
 mono: true

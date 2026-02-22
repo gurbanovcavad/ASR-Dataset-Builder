@@ -69,13 +69,13 @@ def build(
     setattr(config, "write_manifest", write_manifest)
 
     # get platformAdapter or stop the execution (the only available platform is youtube)
-    platformAdapter = registry.get(platform)
-    if platformAdapter == None: 
+    platform_adapter = registry.get(platform)
+    if platform_adapter == None: 
         console.print("[red]Invalid platform[/red]")
         return
     
     # create orchestrator with the channel adapter and config 
-    orchestrator = Orchestrator(console, platformAdapter, platform)
+    orchestrator = Orchestrator(console, platform_adapter, platform)
    
     # build a dataset
     orchestrator.build(channels)

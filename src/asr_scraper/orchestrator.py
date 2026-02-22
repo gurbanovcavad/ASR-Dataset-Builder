@@ -29,7 +29,7 @@ class Orchestrator:
         self.platform_name = plaform_name
         self.console = console
         self.logger = logging.getLogger(__name__)
-        self.max_workers = config.concurrency or 2
+        self.max_workers = config.concurrency
         self.min_delay = 1.0
         self.max_delay = 3.0
         self._lock = threading.Lock() 
