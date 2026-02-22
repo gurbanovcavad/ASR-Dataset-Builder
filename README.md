@@ -1,5 +1,15 @@
 # ASR Dataset Builder
 
+## To run the project via the main function 
+* update the channels.txt
+```
+python -m main
+```
+* for platforms other than youtube, the name of platform should be specified while calling the function 
+```
+python -m main x
+```
+
 ## CLI commands
 
 ### Discover 
