@@ -109,9 +109,9 @@ class YoutubeAdapter(ChannelAdapter):
                     
         except subprocess.CalledProcessError as e:
             print(f"Failed to list videos: {e.stderr}")
-            return
+            return None
         except Exception as e:
             print(str(e))
-            return
+            return None
             
 registry.register("youtube", YoutubeAdapter())
