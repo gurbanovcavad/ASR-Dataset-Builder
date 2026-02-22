@@ -5,7 +5,7 @@ from ..models import VideoItem
 from .base import ChannelAdapter, registry
 from typing import Optional
 
-class YouTubeAdapter(ChannelAdapter):
+class YoutubeAdapter(ChannelAdapter):
     name = "youtube"
 
     def can_handle(self, channel_ref: str) -> bool:
@@ -44,11 +44,9 @@ class YouTubeAdapter(ChannelAdapter):
                 if channel_id:
                     return channel_id
                 else:
-                    print("Empty channel_id")
-                    return None
+                    raise Exception("Empty channel_id")
             else:
-                print(f"Failed to fetch channel_id: {e}")
-                return None
+                raise Exception(f"Failed to fetch channel_id: {e}")
     
     def list_videos(self, channel_ref: str, since: Optional[str] = None):
         if not self.can_handle(channel_ref):
@@ -80,7 +78,6 @@ class YouTubeAdapter(ChannelAdapter):
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
             )
 
-            # remove all the spaces before and after the string
             for line in iter(process.stdout.readline, ""):
                 if not line:
                     continue
@@ -113,5 +110,8 @@ class YouTubeAdapter(ChannelAdapter):
         except subprocess.CalledProcessError as e:
             print(f"Failed to list videos: {e.stderr}")
             return
+        except Exception as e:
+            print(str(e))
+            return
             
-registry.register("youtube", YouTubeAdapter())
+registry.register("youtube", YoutubeAdapter())

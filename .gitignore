@@ -12,3 +12,7 @@ wheels/
 data
 test.py
 videos.json
+temp
+logs
+channels.txt
+manifest.jsonl
