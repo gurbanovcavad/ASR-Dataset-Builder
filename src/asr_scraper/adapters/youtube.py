@@ -3,6 +3,7 @@ import subprocess
 from datetime import datetime
 from ..models import VideoItem
 from .base import ChannelAdapter, registry
+from typing import Optional
 
 class YouTubeAdapter(ChannelAdapter):
     name = "youtube"
@@ -49,7 +50,7 @@ class YouTubeAdapter(ChannelAdapter):
                 print(f"Failed to fetch channel_id: {e}")
                 return None
     
-    def list_videos(self, channel_ref: str):
+    def list_videos(self, channel_ref: str, since: Optional[str] = None):
         if not self.can_handle(channel_ref):
             return None
         cmd = [
@@ -61,18 +62,23 @@ class YouTubeAdapter(ChannelAdapter):
             channel_ref
         ]
         
+        if since is not None: 
+            cmd = [
+                "yt-dlp",
+                "--dateafter", since,
+                "--dump-json",
+                "--ignore-errors",
+                "--no-warnings",
+                channel_ref
+            ]
+        
         try:
-            res = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                check=True
-            )
+            # get normalized channel reference
+            channel = self.normalize_channel_ref(channel_ref)
+
             process = subprocess.Popen(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
             )
-            # get normalized channel reference
-            channel = self.normalize_channel_ref(channel_ref)
 
             # remove all the spaces before and after the string
             for line in iter(process.stdout.readline, ""):
@@ -107,5 +113,5 @@ class YouTubeAdapter(ChannelAdapter):
         except subprocess.CalledProcessError as e:
             print(f"Failed to list videos: {e.stderr}")
             return
-        
+            
 registry.register("youtube", YouTubeAdapter())
