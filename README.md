@@ -18,7 +18,7 @@ uv run python -m main x
 uv sync --no-dev
 ```
 
-### Discover 
+### Discover:
 #### Flags:
 ```
 --platform/-p (optional for now - default: youtube)
@@ -28,7 +28,7 @@ uv sync --no-dev
 uv run audio-scraper discover -c https://www.youtube.com/@turkeiran/videos
 ```
 
-### Build
+### Build:
 #### Flags:
 ```
 --platform/-p (optional for now - default: youtube)
@@ -68,11 +68,11 @@ write_manifest: ./manifest.jsonl
 docker build -t asr-scraper .
 ```
 ```
-docker run -i asr-scraper
+docker run --name asr-scraper asr-scraper
 ```
 
 ## Install FFmpeg
-* Linux (Debian/Ubuntu)
+### Linux (Debian/Ubuntu):
 ```
 sudo apt update  
 ```
@@ -80,12 +80,12 @@ sudo apt update
 sudo apt install ffmpeg
 ```
 
-* macOS
+### macOS:
 ```
 brew install ffmpeg
 ```
 
-* Windows
+### Windows:
 ```
 https://www.ffmpeg.org/download.html
 ```
