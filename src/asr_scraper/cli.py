@@ -8,9 +8,12 @@ from .orchestrator import Orchestrator
 from .config import config
 from asr_scraper.adapters.base import registry
 from asr_scraper.utils.read_config import create_config
+from asr_scraper.utils.logger_config import setup_logging
 
 # create config based on config.yaml file
 create_config()
+
+setup_logging(Path("logs"))
 
 app = typer.Typer(help="ASR Dataset Builder")
 console = Console()
@@ -53,7 +56,6 @@ def build(
     ),
 ):
     console.print("[navy_blue]Building dataset[/navy_blue]")
-    
     # update config object based on user input 
     setattr(config, "channels", channels)
     setattr(config, "output_dir", output_dir)
@@ -73,7 +75,7 @@ def build(
         return
     
     # create orchestrator with the channel adapter and config 
-    orchestrator = Orchestrator(config, platformAdapter, platform)
+    orchestrator = Orchestrator(console, platformAdapter, platform)
    
     # build a dataset
     orchestrator.build(channels)
@@ -100,22 +102,10 @@ def discover(
         return
     
     # create orchestrator with the channel adapter and config 
-    orchestrator = Orchestrator(config, platform_adapter, platform)
+    orchestrator = Orchestrator(console, platform_adapter, platform)
    
     # discover the videos of the provided channel
-    for channel in channels:
-        videos = orchestrator.discover(channel)
-        
-        for video in videos:
-            console.print(f"[blue]{video}[/blue]")
+    orchestrator.discover(channels)
         
     console.print("[green]Discovery completed[/green]")
     
-@app.command()
-def download():
-    console.print("[navy_blue]Downloading videos[/navy_blue]")
-    # TODO - implement download function
-    console.print("[green]Videos are downloaded successfully[/green]")
-
-if __name__ == "__main__":
-    app()   
