@@ -21,7 +21,7 @@ import threading
 
 class Orchestrator:
     def __init__(self, console: Console, platform: ChannelAdapter, plaform_name: str):
-        self.downloader = Downloader(Path(f"./temp/{plaform_name}/"))
+        self.downloader = Downloader(Path(f"temp/{plaform_name}/"))
         self.converter = Converter(config.sample_rate, config.mono, config.pcm_bit_depth)
         self.manifest_writer = ManifestWriter(config.write_manifest)
         self.validator = Validator(config.sample_rate, config.channels)
@@ -100,17 +100,17 @@ class Orchestrator:
             with self._lock:
                 self.manifest_writer.append(result)
 
-            self.console.print(f"[green]{self.platform_name}, {video.channel_ref}, {video.video_id}, {video.url} - ok[/green]")
-            
-            self.logger.info(
-                "ok",
-                extra={
-                    "platform": self.platform_name,
-                    "channel_ref": video.channel_ref,
-                    "video_id": video.video_id,
-                    "url": video.url,
-                },
-            )
+                self.console.print(f"[green]{self.platform_name}, {video.channel_ref}, {video.video_id}, {video.url} - ok[/green]")
+                
+                self.logger.info(
+                    "ok",
+                    extra={
+                        "platform": self.platform_name,
+                        "channel_ref": video.channel_ref,
+                        "video_id": video.video_id,
+                        "url": video.url,
+                    },
+                )
 
         except Exception as e:
             result = JobResult(
@@ -132,17 +132,17 @@ class Orchestrator:
             with self._lock:
                 self.manifest_writer.append(result)
 
-            self.console.print(f"[red]{self.platform_name}, {video.channel_ref}, {video.video_id}, {video.url} - failed[/red]")
+                self.console.print(f"[red]{self.platform_name}, {video.channel_ref}, {video.video_id}, {video.url} - failed[/red]")
 
-            self.logger.error(
-                "failed",
-                extra={
-                    "platform": self.platform_name,
-                    "channel_ref": video.channel_ref,
-                    "video_id": video.video_id,
-                    "url": video.url,
-                },
-            )
+                self.logger.error(
+                    "failed",
+                    extra={
+                        "platform": self.platform_name,
+                        "channel_ref": video.channel_ref,
+                        "video_id": video.video_id,
+                        "url": video.url,
+                    },
+                )
             
     def _write_skipped(self, video):
         result = JobResult(
@@ -163,14 +163,14 @@ class Orchestrator:
         with self._lock:
             self.manifest_writer.append(result)
         
-        self.console.print(f"[yellow]{self.platform_name}, {video.channel_ref}, {video.video_id}, {video.url} - skipped[/yellow]")
+            self.console.print(f"[yellow]{self.platform_name}, {video.channel_ref}, {video.video_id}, {video.url} - skipped[/yellow]")
 
-        self.logger.info(
-            "skipped",
-            extra={
-                "platform": self.platform_name,
-                "channel_ref": video.channel_ref,
-                "video_id": video.video_id,
-                "url": video.url,
-            },
-        )
+            self.logger.info(
+                "skipped",
+                extra={
+                    "platform": self.platform_name,
+                    "channel_ref": video.channel_ref,
+                    "video_id": video.video_id,
+                    "url": video.url,
+                },
+            )

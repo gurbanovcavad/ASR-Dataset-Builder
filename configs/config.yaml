@@ -1,6 +1,6 @@
-output_dir: ./data
+output_dir: data
 # for running via the main function
-channels_file: /home/cavad/Projects/asr-scraper/channels.txt
+channels_file: channels.txt
 sample_rate: 16000
 mono: true
 pcm_bit_depth: 16
@@ -9,4 +9,4 @@ max_videos_per_channel: null
 # format: YYYYMMDD (20260219)
 since_date: null
 skip_existing: true
-write_manifest: ./manifest.jsonl
+write_manifest: manifest.jsonl

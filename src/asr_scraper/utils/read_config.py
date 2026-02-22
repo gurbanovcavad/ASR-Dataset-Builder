@@ -4,7 +4,7 @@ from pathlib import Path
 from asr_scraper.config import config
 
 def create_config():
-    with open("/home/cavad/Projects/asr-scraper/configs/config.yaml") as file:
+    with open("./configs/config.yaml") as file:
         try:
             data = yaml.safe_load(file)
             

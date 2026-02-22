@@ -9,14 +9,20 @@ from .config import config
 from asr_scraper.adapters.base import registry
 from asr_scraper.utils.read_config import create_config
 from asr_scraper.utils.logger_config import setup_logging
+from asr_scraper.utils.system_check import check_ffmpeg
 
+app = typer.Typer(help="ASR Dataset Builder")
+console = Console()
+
+try:
+    check_ffmpeg()
+except Exception as e:
+    console.print(f"[red]{str(e)}[/red]")
+    
 # create config based on config.yaml file
 create_config()
 
 setup_logging(Path("logs"))
-
-app = typer.Typer(help="ASR Dataset Builder")
-console = Console()
 
 # since the only supported platform is youtube, I've set the default value of platform to youtube. To make it interactive, change the first argument of typer.Option to ... in all of the commands
 @app.command()
