@@ -1,16 +1,22 @@
 # ASR Dataset Builder
 
 ## To run the project via the main function 
+```
+uv sync --no-dev
+```
 * update the channels.txt
 ```
-python -m main
+uv run python -m main
 ```
 * for platforms other than youtube, the name of platform should be specified while calling the function 
 ```
-python -m main x
+uv run python -m main x
 ```
 
 ## CLI commands
+```
+uv sync --no-dev
+```
 
 ### Discover 
 #### Flags:
@@ -19,7 +25,7 @@ python -m main x
 --channel/-c (required)
 ``` 
 ```
-audio-scraper discover -c https://www.youtube.com/@turkeiran/videos
+uv run audio-scraper discover -c https://www.youtube.com/@turkeiran/videos
 ```
 
 ### Build
@@ -38,7 +44,7 @@ audio-scraper discover -c https://www.youtube.com/@turkeiran/videos
 --manifest (optional - default: the write_manifest specified in the config file)
 ```
 ```
-audio-scraper build -c https://www.youtube.com/@turkeiran/videos 
+uv run audio-scraper build -c https://www.youtube.com/@turkeiran/videos 
 ```
 
 ## Config file
@@ -56,3 +62,32 @@ since_date: null
 skip_existing: true
 write_manifest: ./manifest.jsonl
 ```
+
+## To run with docker 
+```
+docker build -t asr-scraper .
+```
+```
+docker run -i asr-scraper
+```
+
+## Install FFmpeg
+* Linux (Debian/Ubuntu)
+```
+sudo apt update  
+```
+```
+sudo apt install ffmpeg
+```
+
+* macOS
+```
+brew install ffmpeg
+```
+
+* Windows
+```
+https://www.ffmpeg.org/download.html
+```
+* install the zip file
+* create a new environment variable
