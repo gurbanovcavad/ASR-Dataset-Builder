@@ -18,6 +18,23 @@ uv run python -m main x
 uv sync --no-dev
 ```
 
+### Download:
+#### Flags:
+```
+--platform/-p (optional for now - default: youtube)
+--url (required)
+--output/-o (optional - default: the output_dir specified in the config file)
+--sr (optional - default: the sample_rate specified in the config file)
+--mono/--stereo (optional - default: the mono specified in the config file)
+--codec (pcm_bit_depth) (optional - default: the pcm_bit_depth specified in the config file)
+--jobs/-j (optional - default: the concurrency specified in the config file)
+--skip/--no-skip (optional - default: the skip_existing specified in the config file)
+--manifest (optional - default: the write_manifest specified in the config file)
+```
+```
+uv run audio-scraper download --url "https://www.youtube.com/watch?v=0DnI_6ByBYc"
+```
+
 ### Discover:
 #### Flags:
 ```
@@ -25,7 +42,7 @@ uv sync --no-dev
 --channel/-c (required)
 ``` 
 ```
-uv run audio-scraper discover -c https://www.youtube.com/@turkeiran/videos
+uv run audio-scraper discover -c "https://www.youtube.com/@turkeiran/videos"
 ```
 
 ### Build:
@@ -44,7 +61,7 @@ uv run audio-scraper discover -c https://www.youtube.com/@turkeiran/videos
 --manifest (optional - default: the write_manifest specified in the config file)
 ```
 ```
-uv run audio-scraper build -c https://www.youtube.com/@turkeiran/videos 
+uv run audio-scraper build -c "https://www.youtube.com/@turkeiran/videos"
 ```
 
 ## Config file

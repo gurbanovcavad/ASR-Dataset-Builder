@@ -166,4 +166,4 @@ def download(
    
     # build a dataset
     orchestrator.download(video_url)
-    console.print("[green]Dataset successfully built[/green]")
+    console.print("[green]Video successfully downloaded[/green]")
