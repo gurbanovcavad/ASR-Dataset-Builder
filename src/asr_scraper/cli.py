@@ -165,5 +165,9 @@ def download(
     orchestrator = Orchestrator(console, platform_adapter, platform)
    
     # download the video
-    orchestrator.download(video_url)
-    console.print("[green]Video successfully downloaded[/green]")
+    try:
+        orchestrator.download(video_url)
+        console.print("[green]Video successfully downloaded[/green]")
+    except Exception as e:
+        console.print(f"[red]{str(e)}[/red]")
+           

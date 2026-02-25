@@ -56,7 +56,6 @@ class Orchestrator:
             video = VideoItem(self.platform_name, channel_ref, parts[1], title, url)
             self._process_video(video, 1)
         except Exception as e:
-            self.console.print(f"[red]{str(e)}[/red]")
             self.logger.error(
                     "failed",
                     extra={
@@ -67,6 +66,7 @@ class Orchestrator:
                         "url": url,
                     },
                 )
+            raise(e)
             
                 
     def build(self, channels: List[str]):
