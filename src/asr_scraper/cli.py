@@ -164,6 +164,6 @@ def download(
     # create orchestrator with the channel adapter and config 
     orchestrator = Orchestrator(console, platform_adapter, platform)
    
-    # build a dataset
+    # download the video
     orchestrator.download(video_url)
     console.print("[green]Video successfully downloaded[/green]")
