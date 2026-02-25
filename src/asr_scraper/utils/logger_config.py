@@ -19,7 +19,7 @@ def setup_logging(log_dir: Path):
 
     formatter = logging.Formatter(
         "%(asctime)s | %(levelname)s | "
-        "%(platform)s, %(channel_ref)s, %(video_id)s, %(url)s - %(message)s"
+        "%(order)s - %(platform)s, %(channel_ref)s, %(video_id)s, %(url)s - %(message)s"
     )
 
     file_handler.setFormatter(formatter)

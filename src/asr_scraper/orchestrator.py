@@ -8,6 +8,7 @@ from asr_scraper.utils.slugify import slugify
 from asr_scraper.utils.hashing import hash
 from asr_scraper.models import JobResult
 from asr_scraper.config import config
+from asr_scraper.models import VideoItem
 
 import logging
 from rich.console import Console 
@@ -41,6 +42,33 @@ class Orchestrator:
             for video in videos: 
                 self.console.print(f"[blue]{video}[/blue]")    
         
+    def download(self, url: str):
+        try:
+            # extract video_id from the url
+            parts = url.split("=")
+            if len(parts) != 2:
+                raise Exception("Invalid url")
+
+            # extract title from the url
+            title = self.platform.get_video_title(url)
+            channel_ref = self.platform.normalize_channel_ref(url)
+            
+            video = VideoItem(self.platform_name, channel_ref, parts[1], title, url)
+            self._process_video(video, 1)
+        except Exception as e:
+            self.console.print(f"[red]{str(e)}[/red]")
+            self.logger.error(
+                    "failed",
+                    extra={
+                        "order": 1,
+                        "platform": self.platform_name,
+                        "channel_ref": None,
+                        "video_id": None,
+                        "url": url,
+                    },
+                )
+            
+                
     def build(self, channels: List[str]):
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             futures = []
@@ -53,18 +81,18 @@ class Orchestrator:
                     if config.max_videos_per_channel is not None and c >= config.max_videos_per_channel:
                         break
 
-                    futures.append(executor.submit(self._process_video, video))
+                    futures.append(executor.submit(self._process_video, video, c + 1))
                     c += 1
 
             for f in as_completed(futures):
                 f.result()
             
-    def _process_video(self, video):
+    def _process_video(self, video, order):
         try:
             time.sleep(random.uniform(self.min_delay, self.max_delay))
 
             if config.skip_existing and self.manifest_writer.is_downloaded(self.platform_name, video.video_id):
-                self._write_skipped(video)
+                self._write_skipped(video, order)
                 return
             
             input_path = self.downloader.download_video(video.url, video.video_id)
@@ -100,11 +128,12 @@ class Orchestrator:
             with self._lock:
                 self.manifest_writer.append(result)
 
-                self.console.print(f"[green]{self.platform_name}, {video.channel_ref}, {video.video_id}, {video.url} - ok[/green]")
+                self.console.print(f"[green]{order} - {self.platform_name}, {video.channel_ref}, {video.video_id}, {video.url} - ok[/green]")
                 
                 self.logger.info(
                     "ok",
                     extra={
+                        "order": order,
                         "platform": self.platform_name,
                         "channel_ref": video.channel_ref,
                         "video_id": video.video_id,
@@ -132,11 +161,12 @@ class Orchestrator:
             with self._lock:
                 self.manifest_writer.append(result)
 
-                self.console.print(f"[red]{self.platform_name}, {video.channel_ref}, {video.video_id}, {video.url} - failed[/red]")
+                self.console.print(f"[red]{order} - {self.platform_name}, {video.channel_ref}, {video.video_id}, {video.url} - failed[/red]")
 
                 self.logger.error(
                     "failed",
                     extra={
+                        "order": order,
                         "platform": self.platform_name,
                         "channel_ref": video.channel_ref,
                         "video_id": video.video_id,
@@ -144,7 +174,7 @@ class Orchestrator:
                     },
                 )
             
-    def _write_skipped(self, video):
+    def _write_skipped(self, video, order):
         result = JobResult(
             ts_utc=datetime.now(timezone.utc).strftime("%m/%d/%Y, %H:%M:%S"),
             platform=self.platform_name,
@@ -163,11 +193,12 @@ class Orchestrator:
         with self._lock:
             self.manifest_writer.append(result)
         
-            self.console.print(f"[yellow]{self.platform_name}, {video.channel_ref}, {video.video_id}, {video.url} - skipped[/yellow]")
+            self.console.print(f"[yellow]{order} - {self.platform_name}, {video.channel_ref}, {video.video_id}, {video.url} - skipped[/yellow]")
 
             self.logger.info(
                 "skipped",
                 extra={
+                    "order": order,
                     "platform": self.platform_name,
                     "channel_ref": video.channel_ref,
                     "video_id": video.video_id,

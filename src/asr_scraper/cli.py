@@ -115,3 +115,55 @@ def discover(
         
     console.print("[green]Discovery completed[/green]")
     
+@app.command()
+def download(
+    platform: str = typer.Option(
+        "youtube", "--platform", "-p", help="Platform name"
+    ),
+    video_url: str = typer.Option(
+        ..., "--url", help="Video URL"
+    ),
+    output_dir: Path = typer.Option(
+        config.output_dir, "--output", "-o", help="Output directory"
+    ),
+    sample_rate: int = typer.Option(
+        config.sample_rate, "--sr", help="Sample rate"
+    ),
+    mono: bool = typer.Option(
+        config.mono, "--mono/--stereo", help="Convert to mono"
+    ),
+    pcm_bit_depth: int = typer.Option(
+        config.pcm_bit_depth, "--codec", help="PCM bit depth"
+    ),
+    concurrency: int = typer.Option(
+        config.concurrency, "--jobs", "-j", help="Parallel jobs"
+    ),
+    skip_existing: bool = typer.Option(
+        config.skip_existing, "--skip/--no-skip", help="Skip existing files"
+    ),
+    write_manifest: Path = typer.Option(
+        config.write_manifest, "--manifest", help="Manifest path"
+    ),
+):
+    console.print("[navy_blue]Downloading the video[/navy_blue]")
+    # update config object based on user input 
+    setattr(config, "output_dir", output_dir)
+    setattr(config, "sample_rate", sample_rate)
+    setattr(config, "mono", mono)
+    setattr(config, "pcm_bit_depth", pcm_bit_depth)
+    setattr(config, "concurrency", concurrency)
+    setattr(config, "skip_existing", skip_existing)
+    setattr(config, "write_manifest", write_manifest)
+
+    # get platformAdapter or stop the execution (the only available platform is youtube)
+    platform_adapter = registry.get(platform)
+    if platform_adapter == None: 
+        console.print("[red]Invalid platform[/red]")
+        return
+    
+    # create orchestrator with the channel adapter and config 
+    orchestrator = Orchestrator(console, platform_adapter, platform)
+   
+    # build a dataset
+    orchestrator.download(video_url)
+    console.print("[green]Dataset successfully built[/green]")

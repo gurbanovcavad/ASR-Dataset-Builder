@@ -24,6 +24,28 @@ class YoutubeAdapter(ChannelAdapter):
         
         return False
 
+    def get_video_title(self, url: str) -> str:
+        cmd = [
+            "yt-dlp",
+            "--quiet",
+            "--skip-download",
+            "--no-warnings",
+            "--print", "%(title)s",
+            url
+        ]
+
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            return result.stdout.strip()
+
+        except subprocess.CalledProcessError as e:
+            raise Exception(f"Failed to fetch title: {e.stderr}")
+
     def normalize_channel_ref(self, channel_ref: str):
         cmd = [
             'yt-dlp', '--quiet', '--max-downloads', '1', '--skip-download',

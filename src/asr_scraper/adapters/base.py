@@ -17,6 +17,10 @@ class ChannelAdapter(ABC):
     def normalize_channel_ref(self, channel_ref: str) -> str:
         pass
     
+    @abstractmethod 
+    def get_video_title(self, url: str) -> str:
+        pass
+    
 class AdapterRegistry:
     def __init__(self):
         self._adapters: dict[str, 'ChannelAdapter'] = {}
