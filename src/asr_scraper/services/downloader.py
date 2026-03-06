@@ -56,3 +56,47 @@ class Downloader:
                 raise TransientDownloadError(f"Transient error: {e.stderr}")
             else:
                 raise DownloadError(f"Permanent error: {e.stderr}")
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential_jitter(initial=2, max=10),
+        retry=retry_if_exception_type(TransientDownloadError)
+    )       
+    def download_subtitles(self, url: str, video_id: str) -> Path:
+        self.temp_dir.mkdir(parents=True, exist_ok=True)
+        output_template = self.temp_dir / f"t.{video_id}.%(ext)s"
+        cmd = [
+            "yt-dlp",
+            "--no-warnings",
+            "--skip-download",
+            "--write-subs",
+            "--write-auto-subs",
+            "--sub-lang", "az",
+            "--sub-format", "srt",
+            "-o", str(output_template),
+            '--proxy', self.proxy,
+            "--quiet",
+            url
+        ]
+        
+        try:
+            res = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                check=True,
+                timeout=300
+            )
+            files = list(self.temp_dir.glob(f"t.{video_id}.*"))
+            if files:
+                return files[0]
+            return None
+        
+        except subprocess.TimeoutExpired:
+            raise TransientDownloadError(f"Download timeout for {url}")
+        except subprocess.CalledProcessError as e:
+            stderr = e.stderr.lower()
+            if "http error 429" in stderr or "timeout" in stderr or "http error 5" in stderr or "network" in stderr:
+                raise TransientDownloadError(f"Transient error: {e.stderr}")
+            else:
+                raise DownloadError(f"Permanent error: {e.stderr}")

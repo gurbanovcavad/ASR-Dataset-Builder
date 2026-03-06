@@ -23,6 +23,7 @@ def create_config():
             setattr(config, "write_manifest", Path(data["write_manifest"]))
             proxy = data["proxy"]
             setattr(config, "proxy", "" if proxy is None else proxy)
+            setattr(config, "transcripts_dir", Path(data["transcripts_dir"]))
         except yaml.YAMLError as e:
             print(e)
         except Exception as e:

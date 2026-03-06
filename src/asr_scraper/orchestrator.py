@@ -19,15 +19,17 @@ import random
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
+import subprocess
 
 class Orchestrator:
-    def __init__(self, console: Console, platform: ChannelAdapter, plaform_name: str):
-        self.downloader = Downloader(Path(f"temp/{plaform_name}/"), config.proxy)
+    def __init__(self, console: Console, platform: ChannelAdapter, platform_name: str):
+        self.temp_dir = Path(f"temp/{platform_name}/")
+        self.downloader = Downloader(self.temp_dir, config.proxy)
         self.converter = Converter(config.sample_rate, config.mono, config.pcm_bit_depth)
         self.manifest_writer = ManifestWriter(config.write_manifest)
         self.validator = Validator(config.sample_rate, config.channels)
         self.platform = platform
-        self.platform_name = plaform_name
+        self.platform_name = platform_name
         self.console = console
         self.logger = logging.getLogger(__name__)
         self.max_workers = config.concurrency
@@ -99,11 +101,14 @@ class Orchestrator:
 
             output_dir = config.output_dir / video.channel_ref
             output_dir.mkdir(exist_ok=True, parents=True)
-            output_path = slugify(video.title, output_dir, video.video_id)
+            output_path = slugify(video.title, output_dir, video.video_id, "wav")
 
             self.converter.convert_to_wav(input_path, output_path)
 
             validation_result = self.validator.validate(output_path)
+
+            # delete the temp file audio file
+            input_path.unlink(missing_ok=True)
 
             if not validation_result.ok:
                 output_path.unlink(missing_ok=True)
@@ -124,7 +129,7 @@ class Orchestrator:
                 audio_channels=validation_result.channels,
                 audio_duration_s=validation_result.duration_s,
             )
-
+            
             with self._lock:
                 self.manifest_writer.append(result)
 
@@ -140,6 +145,20 @@ class Orchestrator:
                         "url": video.url,
                     },
                 )
+
+            try:
+                temp_path = self.downloader.download_subtitles(video.url, video.video_id)
+                transcript_dir = config.transcripts_dir / video.channel_ref
+                transcript_dir.mkdir(parents=True, exist_ok=True)
+                transcript_path = slugify(video.title, transcript_dir, video.video_id, "txt")
+                
+                # delete timestamps and etc. 
+                self._create_transcript(temp_path, transcript_path)
+
+                # delete the temporary file
+                temp_path.unlink()
+            except Exception as e:
+                pass
 
         except Exception as e:
             result = JobResult(
@@ -205,3 +224,17 @@ class Orchestrator:
                     "url": video.url,
                 },
             )
+            
+    def _create_transcript(self, input, output):
+        cmd = [
+            "sed",
+            "-e", r"/^[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9] --> [0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9]$/d",
+            "-e", r"/^[[:digit:]]\{1,4\}$/d",
+            "-e", r"s/>> //g",
+            "-e", r"s/<[^>]*>//g",
+            "-e", r"/^[[:space:]]*$/d",
+            str(input)
+        ]
+
+        with open(output, "w") as f:
+            subprocess.run(cmd, stdout=f, check=True)

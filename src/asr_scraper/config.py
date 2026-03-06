@@ -15,6 +15,7 @@ class Config:
                 skip_existing: bool = True, 
                 write_manifest: Path = Path("./manifest.jsonl"),
                 proxy: str = "",
+                transcripts_dir: Path = Path("transcripts"),
         ):
         self.channels = channels
         self.output_dir = output_dir
@@ -27,6 +28,7 @@ class Config:
         self.skip_existing = skip_existing
         self.write_manifest = write_manifest
         self.proxy = proxy
+        self.transcripts_dir = transcripts_dir
         # platform_overrides: 
         
 config = Config()
