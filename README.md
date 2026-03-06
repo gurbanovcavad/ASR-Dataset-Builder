@@ -14,6 +14,7 @@ max_videos_per_channel: null
 since_date: null
 skip_existing: true
 write_manifest: manifest.jsonl
+transcripts_dir: transcripts
 proxy: 
 ```
 
