@@ -21,7 +21,8 @@ def create_config():
             setattr(config, "since_date", data["since_date"])
             setattr(config, "skip_existing", data["skip_existing"])
             setattr(config, "write_manifest", Path(data["write_manifest"]))
-            setattr(config, "proxy", data["proxy"])
+            proxy = data["proxy"]
+            setattr(config, "proxy", "" if proxy is None else proxy)
         except yaml.YAMLError as e:
             print(e)
         except Exception as e:
