@@ -1,6 +1,24 @@
 # ASR Dataset Builder
 
+## Config file
+* configs/config.yaml
+```
+output_dir: data
+channels_file: channels.txt
+sample_rate: 16000
+mono: true
+pcm_bit_depth: 16
+concurrency: 3
+max_videos_per_channel: null 
+# format: YYYYMMDD (20260219)
+since_date: null
+skip_existing: true
+write_manifest: manifest.jsonl
+proxy: 
+```
+
 ## To run the project via the main function 
+* add proxy
 ```
 uv sync --no-dev
 ```
@@ -14,6 +32,7 @@ uv run python -m main x
 ```
 
 ## CLI commands
+* add proxy
 ```
 uv sync --no-dev
 ```
@@ -62,22 +81,6 @@ uv run audio-scraper discover -c "https://www.youtube.com/@turkeiran/videos"
 ```
 ```
 uv run audio-scraper build -c "https://www.youtube.com/@turkeiran/videos"
-```
-
-## Config file
-* configs/config.yaml
-```
-output_dir: data
-channels_file: channels.txt
-sample_rate: 16000
-mono: true
-pcm_bit_depth: 16
-concurrency: 3
-max_videos_per_channel: null 
-# format: YYYYMMDD (20260219)
-since_date: null
-skip_existing: true
-write_manifest: manifest.jsonl
 ```
 
 ## To run with docker 
