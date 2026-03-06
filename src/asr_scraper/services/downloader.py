@@ -10,8 +10,9 @@ class TransientDownloadError(Exception):
     pass
 
 class Downloader:
-    def __init__(self, temp_dir: Path):
+    def __init__(self, temp_dir: Path, proxy: str):
         self.temp_dir = temp_dir
+        self.proxy = proxy
         
     @retry(
         stop=stop_after_attempt(3),
@@ -28,6 +29,7 @@ class Downloader:
             "--extract-audio",
             "--audio-format", "best",
             "--no-playlist",
+            '--proxy', self.proxy,
             "--no-warnings",
             "-o", str(output_template),
             url

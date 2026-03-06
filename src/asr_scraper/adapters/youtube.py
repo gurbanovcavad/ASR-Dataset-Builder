@@ -4,6 +4,7 @@ from datetime import datetime
 from ..models import VideoItem
 from .base import ChannelAdapter, registry
 from typing import Optional
+from asr_scraper.config import config
 
 class YoutubeAdapter(ChannelAdapter):
     name = "youtube"
@@ -30,6 +31,7 @@ class YoutubeAdapter(ChannelAdapter):
             "--quiet",
             "--skip-download",
             "--no-warnings",
+            '--proxy', config.proxy,
             "--print", "%(title)s",
             url
         ]
@@ -49,7 +51,7 @@ class YoutubeAdapter(ChannelAdapter):
     def normalize_channel_ref(self, channel_ref: str):
         cmd = [
             'yt-dlp', '--quiet', '--max-downloads', '1', '--skip-download',
-            '--no-warnings', '--print', '%(channel_id)s', channel_ref
+            '--no-warnings', '--proxy', config.proxy, '--print', '%(channel_id)s', channel_ref
         ]
         try:
             res = subprocess.run(cmd, capture_output=True, text=True, check=True)

@@ -22,7 +22,7 @@ import threading
 
 class Orchestrator:
     def __init__(self, console: Console, platform: ChannelAdapter, plaform_name: str):
-        self.downloader = Downloader(Path(f"temp/{plaform_name}/"))
+        self.downloader = Downloader(Path(f"temp/{plaform_name}/"), config.proxy)
         self.converter = Converter(config.sample_rate, config.mono, config.pcm_bit_depth)
         self.manifest_writer = ManifestWriter(config.write_manifest)
         self.validator = Validator(config.sample_rate, config.channels)

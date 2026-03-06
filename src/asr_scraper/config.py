@@ -14,6 +14,7 @@ class Config:
                 since_date: Optional[str] = None, 
                 skip_existing: bool = True, 
                 write_manifest: Path = Path("./manifest.jsonl"),
+                proxy: str = "",
         ):
         self.channels = channels
         self.output_dir = output_dir
@@ -25,6 +26,7 @@ class Config:
         self.since_date = since_date 
         self.skip_existing = skip_existing
         self.write_manifest = write_manifest
+        self.proxy = proxy
         # platform_overrides: 
         
 config = Config()
