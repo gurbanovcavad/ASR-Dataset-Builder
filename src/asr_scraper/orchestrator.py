@@ -34,7 +34,7 @@ class Orchestrator:
         self.logger = logging.getLogger(__name__)
         self.max_workers = config.concurrency
         self.min_delay = 1.0
-        self.max_delay = 3.0
+        self.max_delay = 4.0
         self._lock = threading.Lock() 
     
     def discover(self, channels: List[str]):
@@ -146,6 +146,7 @@ class Orchestrator:
                     },
                 )
 
+            time.sleep(random.uniform(self.min_delay, self.max_delay))
             try:
                 temp_path = self.downloader.download_subtitles(video.url, video.video_id)
                 transcript_dir = config.transcripts_dir / video.channel_ref
