@@ -2,7 +2,7 @@
 
 ## Config file
 * configs/config.yaml
-```
+```yaml
 output_dir: data
 channels_file: channels.txt
 sample_rate: 16000
@@ -20,21 +20,21 @@ proxy:
 
 ## To run the project via the main function 
 * add proxy
-```
+```bash
 uv sync --no-dev
 ```
 * update the channels.txt
-```
+```bash
 uv run python -m main
 ```
 * for platforms other than youtube, the name of platform should be specified while calling the function 
-```
+```bash
 uv run python -m main x
 ```
 
 ## CLI commands
 * add proxy
-```
+```bash
 uv sync --no-dev
 ```
 
@@ -51,7 +51,7 @@ uv sync --no-dev
 --skip/--no-skip (optional - default: the skip_existing specified in the config file)
 --manifest (optional - default: the write_manifest specified in the config file)
 ```
-```
+```bash
 uv run audio-scraper download --url "https://www.youtube.com/watch?v=0DnI_6ByBYc"
 ```
 
@@ -61,7 +61,7 @@ uv run audio-scraper download --url "https://www.youtube.com/watch?v=0DnI_6ByBYc
 --platform/-p (optional for now - default: youtube)
 --channel/-c (required)
 ``` 
-```
+```bash
 uv run audio-scraper discover -c "https://www.youtube.com/@turkeiran/videos"
 ```
 
@@ -80,24 +80,24 @@ uv run audio-scraper discover -c "https://www.youtube.com/@turkeiran/videos"
 --skip/--no-skip (optional - default: the skip_existing specified in the config file)
 --manifest (optional - default: the write_manifest specified in the config file)
 ```
-```
+```bash
 uv run audio-scraper build -c "https://www.youtube.com/@turkeiran/videos"
 ```
 
 ## To run with docker 
-```
+```bash
 docker build -t asr-scraper .
 ```
-```
+```bash
 docker run --name asr-scraper asr-scraper
 ```
 
 ## Install FFmpeg
 ### Linux (Debian/Ubuntu):
-```
+```bash
 sudo apt update  
 ```
-```
+```bash
 sudo apt install ffmpeg
 ```
 
